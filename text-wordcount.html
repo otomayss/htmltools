@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>字数统计 - 文本工具 - 全能工具站</title>
+    <style>
+        /* 全局样式 */
+        :root {
+            --primary-color: #165DFF;      /* 主色调：深蓝色 */
+            --bg-color: #F5F7FA;           /* 背景色：浅灰 */
+            --card-color: #FFFFFF;         /* 卡片底色：白色 */
+            --text-color: #333333;         /* 主要文字色：深灰 */
+            --success-color: #00B42A;      /* 成功状态：绿色 */
+            --error-color: #F53F3F;        /* 错误提示：红色 */
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 统一阴影效果 */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 导航栏样式 */
+        header {
+            background-color: var(--card-color);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 24px;
+        }
+
+        /* 主要内容区域 */
+        main {
+            flex: 1;
+            padding: 40px 0;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .page-header p {
+            font-size: 16px;
+            color: #666;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .breadcrumb span {
+            margin: 0 8px;
+        }
+
+        /* 工具区域样式 */
+        .tool-container {
+            background-color: var(--card-color);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .input-area {
+            margin-bottom: 20px;
+        }
+
+        .input-area label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .input-area textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        .input-area textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0E4FC5;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: var(--text-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .result-area {
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            padding: 20px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 500;
+        }
+
+        .result-value {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .copy-btn {
+            margin-top: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .copy-btn .icon {
+            font-size: 16px;
+        }
+
+        .copy-message {
+            display: none;
+            color: var(--success-color);
+            margin-left: 10px;
+            font-size: 14px;
+        }
+
+        /* 相关工具推荐 */
+        .related-tools {
+            margin-top: 40px;
+        }
+
+        .related-tools h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+
+        .related-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .related-links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            padding: 8px 15px;
+            background-color: rgba(22, 93, 255, 0.1);
+            border-radius: 4px;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .related-links a:hover {
+            background-color: rgba(22, 93, 255, 0.2);
+        }
+
+        /* 页脚样式 */
+        footer {
+            background-color: var(--card-color);
+            padding: 20px 0;
+            text-align: center;
+            margin-top: auto;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        footer p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 767px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                right: 0;
+                background-color: var(--card-color);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                padding: 20px;
+                z-index: 99;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .page-header h1 {
+                font-size: 26px;
+            }
+
+            .page-header p {
+                font-size: 14px;
+            }
+
+            .tool-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <header>
+        <div class="container">
+            <nav>
+                <a href="index.html" class="logo">全能工具站</a>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="smart-tools.html">智能工具</a></li>
+                    <li><a href="text-tools.html">文本工具</a></li>
+                    <li><a href="image-tools.html">图片工具</a></li>
+                    <li><a href="video-tools.html">视频工具</a></li>
+                    <li><a href="audio-tools.html">音频工具</a></li>
+                    <li><a href="office-tools.html">办公工具</a></li>
+                    <li><a href="number-tools.html">数字工具</a></li>
+                    <li><a href="unit-converter.html">单位换算</a></li>
+                    <li><a href="dev-tools.html">开发工具</a></li>
+                </ul>
+                <button class="hamburger" id="hamburger">☰</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="container">
+        <div class="breadcrumb">
+            <a href="index.html">首页</a>
+            <span>></span>
+            <a href="text-tools.html">文本工具</a>
+            <span>></span>
+            <a href="text-wordcount.html">字数统计</a>
+        </div>
+
+        <section class="page-header">
+            <h1>字数统计工具</h1>
+            <p>快速统计文本中的字符数、单词数、段落数和行数，帮助您了解文本长度和结构</p>
+        </section>
+
+        <section class="tool-container">
+            <div class="input-area">
+                <label for="text-input">请输入或粘贴需要统计的文本：</label>
+                <textarea id="text-input" placeholder="在此输入文本内容..."></textarea>
+            </div>
+
+            <div class="button-group">
+                <button id="count-btn" class="btn btn-primary">开始统计</button>
+                <button id="clear-btn" class="btn btn-secondary">清空内容</button>
+                <button id="sample-btn" class="btn btn-secondary">插入示例文本</button>
+            </div>
+
+            <div class="result-area" id="result-container">
+                <div class="result-item">
+                    <span class="result-label">字符数（含空格）：</span>
+                    <span class="result-value" id="char-count">0</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">字符数（不含空格）：</span>
+                    <span class="result-value" id="char-count-no-space">0</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">单词数：</span>
+                    <span class="result-value" id="word-count">0</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">段落数：</span>
+                    <span class="result-value" id="paragraph-count">0</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">行数：</span>
+                    <span class="result-value" id="line-count">0</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">中文字数：</span>
+                    <span class="result-value" id="chinese-count">0</span>
+                </div>
+
+                <button id="copy-btn" class="btn btn-secondary copy-btn">
+                    <span class="icon">📋</span> 复制统计结果
+                </button>
+                <span id="copy-message" class="copy-message">已复制到剪贴板！</span>
+            </div>
+        </section>
+
+        <section class="related-tools">
+            <h3>相关工具推荐</h3>
+            <div class="related-links">
+                <a href="text-case-converter.html">大小写转换</a>
+                <a href="text-duplicate-remover.html">文本去重</a>
+                <a href="text-symbol-remover.html">特殊符号去除</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <p>© 2024 全能工具站 | 纯前端静态工具</p>
+            <p>所有工具均在本地运行，保护隐私</p>
+        </div>
+    </footer>
+
+    <script>
+        // 汉堡菜单交互
+        document.getElementById('hamburger').addEventListener('click', function() {
+            document.getElementById('navLinks').classList.toggle('active');
+        });
+
+        // 点击页面其他区域关闭菜单
+        document.addEventListener('click', function(event) {
+            const navLinks = document.getElementById('navLinks');
+            const hamburger = document.getElementById('hamburger');
+            
+            if (event.target !== hamburger && !hamburger.contains(event.target) && 
+                event.target !== navLinks && !navLinks.contains(event.target)) {
+                navLinks.classList.remove('active');
+            }
+        });
+
+        // 字数统计功能
+        const textInput = document.getElementById('text-input');
+        const countBtn = document.getElementById('count-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const sampleBtn = document.getElementById('sample-btn');
+        const copyBtn = document.getElementById('copy-btn');
+        const copyMessage = document.getElementById('copy-message');
+
+        // 统计结果元素
+        const charCount = document.getElementById('char-count');
+        const charCountNoSpace = document.getElementById('char-count-no-space');
+        const wordCount = document.getElementById('word-count');
+        const paragraphCount = document.getElementById('paragraph-count');
+        const lineCount = document.getElementById('line-count');
+        const chineseCount = document.getElementById('chinese-count');
+
+        // 统计函数
+        function countStats() {
+            const text = textInput.value;
+            
+            // 字符数（含空格）
+            charCount.textContent = text.length;
+            
+            // 字符数（不含空格）
+            charCountNoSpace.textContent = text.replace(/\s/g, '').length;
+            
+            // 单词数
+            const words = text.match(/\b\w+\b/g);
+            wordCount.textContent = words ? words.length : 0;
+            
+            // 段落数
+            const paragraphs = text.split(/\n+/).filter(p => p.trim().length > 0);
+            paragraphCount.textContent = paragraphs.length;
+            
+            // 行数
+            const lines = text.split('\n');
+            lineCount.textContent = lines.length;
+            
+            // 中文字数
+            const chineseChars = text.match(/[\u4e00-\u9fa5]/g);
+            chineseCount.textContent = chineseChars ? chineseChars.length : 0;
+        }
+
+        // 按钮事件监听
+        countBtn.addEventListener('click', countStats);
+
+        clearBtn.addEventListener('click', function() {
+            textInput.value = '';
+            countStats();
+        });
+
+        sampleBtn.addEventListener('click', function() {
+            textInput.value = '这是一段示例文本，用于演示字数统计工具的功能。\n\n它包含了多个段落、标点符号和空格，可以用来测试各种统计指标。\n这一行是第三行文本内容。\n\nThis is an English sentence with 9 words.\n\n这段文本总共有：\n- 3个段落\n- 5行文本\n- 包含中英文混合内容';
+            countStats();
+        });
+
+        // 复制结果功能
+        copyBtn.addEventListener('click', function() {
+            const resultText = `字符数（含空格）：${charCount.textContent}\n` +
+                              `字符数（不含空格）：${charCountNoSpace.textContent}\n` +
+                              `单词数：${wordCount.textContent}\n` +
+                              `段落数：${paragraphCount.textContent}\n` +
+                              `行数：${lineCount.textContent}\n` +
+                              `中文字数：${chineseCount.textContent}`;
+            
+            navigator.clipboard.writeText(resultText).then(function() {
+                copyMessage.style.display = 'inline';
+                setTimeout(function() {
+                    copyMessage.style.display = 'none';
+                }, 2000);
+            });
+        });
+
+        // 输入时实时统计（可选，取消注释启用）
+        // textInput.addEventListener('input', countStats);
+
+        // 页面加载时初始化统计
+        window.addEventListener('load', countStats);
+    </script>
+</body>
+</html>
